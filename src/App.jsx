@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import FloatingMenu from './components/FloatingMenu';
 import Home from './pages/Home';
 import About from './pages/About';
 import Portfolio from './pages/Portfolio';
@@ -30,6 +31,7 @@ function App() {
           </Routes>
         </main>
         <Footer />
+        <FloatingMenu />
       </div>
     </Router>
   );
