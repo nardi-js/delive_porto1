@@ -9,7 +9,7 @@ const FloatingMenu = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      // Show the button when scrolling
+      // Show the button immediately when scrolling
       setIsVisible(true);
 
       // Clear existing timeout
@@ -17,10 +17,10 @@ const FloatingMenu = () => {
         clearTimeout(scrollTimeout);
       }
 
-      // Hide after 2 seconds of no scrolling (tapi menu tetap open jika sudah dibuka)
+      // Hide after 5 seconds of no scrolling (lebih lama dari sebelumnya)
       const timeout = setTimeout(() => {
         setIsVisible(false);
-      }, 2000);
+      }, 5000);
 
       setScrollTimeout(timeout);
     };
