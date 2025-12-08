@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
 const FloatingMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [scrollTimeout, setScrollTimeout] = useState(null);
+  const menuRef = useRef(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -16,10 +17,9 @@ const FloatingMenu = () => {
         clearTimeout(scrollTimeout);
       }
 
-      // Hide after 2 seconds of no scrolling
+      // Hide after 2 seconds of no scrolling (tapi menu tetap open jika sudah dibuka)
       const timeout = setTimeout(() => {
         setIsVisible(false);
-        setIsOpen(false); // Close menu when hiding
       }, 2000);
 
       setScrollTimeout(timeout);
@@ -35,14 +35,29 @@ const FloatingMenu = () => {
     };
   }, [scrollTimeout]);
 
+  // Handle click outside to close menu
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target) && isOpen) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
+
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
 
   return (
     <div
+      ref={menuRef}
       className={`fixed bottom-8 right-8 z-50 transition-all duration-500 ${
-        isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-24 pointer-events-none'
+        isVisible || isOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-24 pointer-events-none'
       }`}
     >
       {/* Menu Items */}
@@ -53,8 +68,7 @@ const FloatingMenu = () => {
       >
         <Link
           to="/admin"
-          className="bg-white shadow-lg rounded-full px-6 py-3 text-sm font-medium text-gray-800 hover:bg-gray-100 transition-all duration-200 whitespace-nowrap"
-          onClick={() => setIsOpen(false)}
+          className="bg-white border-2 border-black shadow-lg px-6 py-3 text-sm font-medium text-black hover:bg-black hover:text-white transition-all duration-200 whitespace-nowrap tracking-wide uppercase"
         >
           Edit Website
         </Link>
@@ -62,8 +76,7 @@ const FloatingMenu = () => {
           href="https://www.delive.online/templates"
           target="_blank"
           rel="noopener noreferrer"
-          className="bg-white shadow-lg rounded-full px-6 py-3 text-sm font-medium text-gray-800 hover:bg-gray-100 transition-all duration-200 whitespace-nowrap"
-          onClick={() => setIsOpen(false)}
+          className="bg-white border-2 border-black shadow-lg px-6 py-3 text-sm font-medium text-black hover:bg-black hover:text-white transition-all duration-200 whitespace-nowrap tracking-wide uppercase"
         >
           Buy
         </a>
@@ -71,8 +84,7 @@ const FloatingMenu = () => {
           href="https://www.delive.online/templates"
           target="_blank"
           rel="noopener noreferrer"
-          className="bg-white shadow-lg rounded-full px-6 py-3 text-sm font-medium text-gray-800 hover:bg-gray-100 transition-all duration-200 whitespace-nowrap"
-          onClick={() => setIsOpen(false)}
+          className="bg-white border-2 border-black shadow-lg px-6 py-3 text-sm font-medium text-black hover:bg-black hover:text-white transition-all duration-200 whitespace-nowrap tracking-wide uppercase"
         >
           All Template
         </a>
@@ -80,16 +92,18 @@ const FloatingMenu = () => {
 
       {/* Floating Button with Pulse Animation */}
       <div className="relative">
-        {/* Animated Rings */}
-        <div className="absolute inset-0 rounded-full">
-          <div className="absolute inset-0 rounded-full bg-gray-800 animate-ping opacity-20"></div>
-          <div className="absolute inset-0 rounded-full bg-gray-800 animate-pulse opacity-30"></div>
-        </div>
+        {/* Animated Rings - hanya muncul saat belum dibuka */}
+        {!isOpen && (
+          <div className="absolute inset-0 rounded-full">
+            <div className="absolute inset-0 rounded-full bg-black animate-ping opacity-20"></div>
+            <div className="absolute inset-0 rounded-full bg-black animate-pulse opacity-30"></div>
+          </div>
+        )}
 
         {/* Main Button */}
         <button
           onClick={toggleMenu}
-          className="relative w-16 h-16 bg-gradient-to-br from-gray-800 to-gray-900 text-white rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 flex items-center justify-center hover:scale-110 active:scale-95"
+          className="relative w-16 h-16 bg-black text-white shadow-2xl hover:shadow-3xl transition-all duration-300 flex items-center justify-center hover:scale-110 active:scale-95 border-2 border-black hover:bg-white hover:text-black"
           aria-label="Toggle menu"
         >
           <svg
